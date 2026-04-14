@@ -1,0 +1,36 @@
+/* Стили для страницы управления заказами */
+.orders-table th,
+.orders-table td {
+    padding: 0.75rem 1.5rem;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.orders-table th {
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7280;
+    background-color: #f9fafb;
+}
+
+.orders-table td {
+    font-size: 0.875rem;
+    color: #111827;
+}
+
+.orders-table .status-select {
+    border: 1px solid #d1d5db;
+    border-radius: 0.25rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.orders-table .update-button {
+    color: #d97706;
+    transition: color 0.2s;
+}
+
+.orders-table .update-button:hover {
+    color: #b45309;
+}
