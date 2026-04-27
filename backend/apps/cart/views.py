@@ -32,3 +32,7 @@ class CartItemUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return CartItem.objects.filter(user=self.request.user)
+
+    def update(self, request, *args, **kwargs):
+        kwargs['partial'] = True   # разрешаем частичное обновление
+        return super().update(request, *args, **kwargs)

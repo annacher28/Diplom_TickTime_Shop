@@ -9,4 +9,7 @@ class CartItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
         fields = ('id', 'product', 'product_detail', 'quantity', 'total', 'added_at')
-        read_only_fields = ('user',)
+        read_only_fields = ('user', 'added_at')
+        extra_kwargs = {
+            'product': {'required': False}   # поле product необязательно при обновлении
+        }

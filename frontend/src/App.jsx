@@ -33,47 +33,74 @@ const Navbar = () => {
     return (
         <nav className="bg-gray-900 text-white shadow-lg">
             <div className="container mx-auto px-4">
-                <div className="flex items-center h-16">
-                    {/* Левая группа: логотип и ссылка "Каталог" */}
-                    <Link to="/" className="text-xl font-bold hover:text-gray-400 transition mr-6">
-                        TickTime
-                    </Link>
+                <div className="flex items-center justify-between h-16">
+                    {/* Левая часть: навигационные ссылки */}
                     <div className="hidden md:flex space-x-6">
-                        {!isAdmin && <Link to="/catalog" className="hover:text-gray-400 transition">Каталог</Link>}
-                        {isAuthenticated && !isAdmin && <Link to="/favorites" className="hover:text-gray-400 transition">Избранное</Link>}
-                        {isAuthenticated && !isAdmin && <Link to="/profile" className="hover:text-gray-400 transition">Личный кабинет</Link>}
-                        {isAdmin && <Link to="/admin/products" className="hover:text-gray-400 transition">Управление товарами</Link>}
-                        {isAdmin && <Link to="/admin/orders" className="hover:text-gray-400 transition">Управление заказами</Link>}
+                        {isAdmin ? (
+                            // Ссылки для администратора
+                            <>
+                                <Link to="/admin/products" className="hover:text-gray-400 transition">
+                                    Управление товарами
+                                </Link>
+                                <Link to="/admin/orders" className="hover:text-gray-400 transition">
+                                    Управление заказами
+                                </Link>
+                            </>
+                        ) : (
+                            // Ссылки для обычных пользователей и гостей
+                            <>
+                                <Link to="/" className="hover:text-gray-400 transition">
+                                    Главная
+                                </Link>
+                                <Link to="/catalog" className="hover:text-gray-400 transition">
+                                    Каталог
+                                </Link>
+                                {isAuthenticated && (
+                                    <Link to="/favorites" className="hover:text-gray-400 transition">
+                                        Избранное
+                                    </Link>
+                                )}
+                                {isAuthenticated && (
+                                    <Link to="/cart" className="hover:text-gray-400 transition">
+                                        Корзина
+                                        {getCartCount() > 0 && (
+                                            <span className="ml-1 bg-amber-500 text-white text-xs rounded-full px-1.5 py-0.5">
+                                                {getCartCount()}
+                                            </span>
+                                        )}
+                                    </Link>
+                                )}
+                            </>
+                        )}
                     </div>
 
-                    {/* Пружина, отодвигающая правую группу вправо */}
-                    <div className="flex-1"></div>
+                    {/* Центральная часть: логотип */}
+                    <div className="absolute left-1/2 transform -translate-x-1/2">
+                        <Link to="/">
+                           <img src="/logo_w.png" alt="TickTime Logo" className="h-10 w-auto" />
+                        </Link>
+                    </div>
 
-                    {/* Правая группа: корзина, кнопки входа/выхода */}
+                    {/* Правая часть: имя пользователя и выход */}
                     <div className="flex items-center space-x-4">
-                        {isAuthenticated && !isAdmin && (
-                            <Link to="/cart" className="relative hover:text-gray-400 transition">
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6h11l-1.5-6M7 13h10M9 21h2M13 21h2" />
-                                </svg>
-                                {getCartCount() > 0 && (
-                                    <span className="absolute -top-2 -right-2 bg-gray-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                                        {getCartCount()}
-                                    </span>
-                                )}
-                            </Link>
-                        )}
-
                         {!isAuthenticated ? (
                             <div className="space-x-2">
-                                <Link to="/login" className="px-4 py-2 bg-gray-600 rounded-md hover:bg-gray-800 transition">Вход</Link>
-                                <Link to="/register" className="px-4 py-2 bg-gray-600 rounded-md hover:bg-gray-800 transition">Регистрация</Link>
+                                <Link to="/login" className="px-4 py-2 bg-gray-600 rounded-md hover:bg-gray-800 transition">
+                                    Вход
+                                </Link>
+                                <Link to="/register" className="px-4 py-2 bg-gray-600 rounded-md hover:bg-gray-800 transition">
+                                    Регистрация
+                                </Link>
                             </div>
                         ) : (
-                            <div className="flex items-center space-x-3">
-                                <span className="text-sm text-gray-300">{user?.username}</span>
-                                <button onClick={logout} className="px-3 py-1 rounded-md hover:text-gray-400 transition">Выйти</button>
-                            </div>
+                            <>
+                                <Link to="/profile" className="text-sm text-gray-300 hover:text-white transition">
+                                    {user?.username || user?.email || 'Аккаунт'}
+                                </Link>
+                                <button onClick={logout} className="px-3 py-1 rounded-md hover:text-gray-400 transition">
+                                    Выйти
+                                </button>
+                            </>
                         )}
                     </div>
                 </div>

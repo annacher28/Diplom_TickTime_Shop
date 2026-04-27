@@ -1,5 +1,5 @@
-// src/pages/CartPage.jsx
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -11,6 +11,13 @@ const CartPage = () => {
     const navigate = useNavigate();
     const [address, setAddress] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
+
+    // При монтировании страницы и при изменении isAuthenticated обновляем корзину
+    useEffect(() => {
+        if (isAuthenticated) {
+            refreshCart();
+        }
+    }, [isAuthenticated, refreshCart]);
 
     const handleQuantityChange = (itemId, currentQuantity, delta) => {
         const newQuantity = currentQuantity + delta;
