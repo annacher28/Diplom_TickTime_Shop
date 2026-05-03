@@ -17,6 +17,8 @@ import AdminOrdersPage from './pages/AdminOrdersPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 
+import { ToastProvider } from './contexts/ToastContext';
+
 // Компонент для запрета доступа админам к обычным страницам
 const BlockAdminRoute = ({ children }) => {
     const { isAdmin } = useAuth();
@@ -64,7 +66,7 @@ const Navbar = () => {
                                     <Link to="/cart" className="hover:text-gray-400 transition">
                                         Корзина
                                         {getCartCount() > 0 && (
-                                            <span className="ml-1 bg-amber-500 text-white text-xs rounded-full px-1.5 py-0.5">
+                                            <span className="ml-1 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5">
                                                 {getCartCount()}
                                             </span>
                                         )}
@@ -141,7 +143,9 @@ function App() {
         <Router>
             <AuthProvider>
                 <CartProvider>
-                    <AppContent />
+                    <ToastProvider>
+                        <AppContent />
+                    </ToastProvider>
                 </CartProvider>
             </AuthProvider>
         </Router>

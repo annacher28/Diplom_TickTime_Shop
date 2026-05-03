@@ -1,5 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { formatPrice } from '../utils/formatPrice';
 
 const ProtectedRoute = ({ children, requiredRole }) => {
     const { isAuthenticated, loading, isAdmin } = useAuth();

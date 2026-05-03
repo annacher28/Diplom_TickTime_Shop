@@ -3,12 +3,17 @@ import { Link } from 'react-router-dom';
 import * as productsApi from '../api/products';
 import * as favoritesApi from '../api/favorites';
 import { useAuth } from '../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext';
+import { useToast } from '../contexts/ToastContext';
+import { formatPrice } from '../utils/formatPrice';
 
 const CatalogPage = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [favorites, setFavorites] = useState(new Set());
     const { isAuthenticated } = useAuth();
+    const { addItem } = useCart();
+    const { addToast } = useToast();
 
     useEffect(() => {
         fetchProducts();
@@ -37,19 +42,36 @@ const CatalogPage = () => {
 
     const toggleFavorite = async (productId) => {
         if (!isAuthenticated) {
-            alert('Войдите, чтобы добавлять в избранное');
+            addToast('Войдите, чтобы добавлять в избранное', 'error');
             return;
         }
         try {
             if (favorites.has(productId)) {
                 await favoritesApi.removeFromFavorites(productId);
                 setFavorites(prev => { const s = new Set(prev); s.delete(productId); return s; });
+                addToast('Товар удален из избранного', 'info');
             } else {
                 await favoritesApi.addToFavorites(productId);
                 setFavorites(prev => new Set(prev).add(productId));
+                addToast('Товар добавлен в избранное', 'success');
             }
         } catch (err) {
             console.error(err);
+            addToast('Ошибка при изменении избранного', 'error');
+        }
+    };
+
+    const addToCart = async (productId) => {
+        if (!isAuthenticated) {
+            addToast('Войдите, чтобы добавить товар в корзину', 'error');
+            return;
+        }
+        try {
+            await addItem(productId, 1);
+            addToast('Товар добавлен в корзину', 'success');
+        } catch (err) {
+            console.error(err);
+            addToast('Ошибка добавления в корзину', 'error');
         }
     };
 
@@ -61,8 +83,8 @@ const CatalogPage = () => {
                 <h1 className="text-3xl font-bold mb-8">Каталог часов</h1>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {products.map(product => (
-                        <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
-                            <Link to={`/product/${product.id}`}>
+                        <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col">
+                            <Link to={`/product/${product.id}`} className="block">
                                 <div className="h-64 bg-gray-200 flex items-center justify-center">
                                     {product.image ? (
                                         <img src={`${product.image}`} alt={product.name} className="w-full h-full object-cover" />
@@ -71,14 +93,23 @@ const CatalogPage = () => {
                                     )}
                                 </div>
                             </Link>
-                            <div className="p-4">
+                            <div className="p-4 flex flex-col flex-grow">
                                 <Link to={`/product/${product.id}`}>
-                                    <h2 className="text-xl font-semibold mb-2 hover:text-amber-600">{product.name}</h2>
+                                    <h2 className="text-xl font-semibold hover:text-gray-700 transition">{product.name}</h2>
                                 </Link>
-                                <p className="text-gray-600 text-sm mb-2 line-clamp-2">{product.description}</p>
-                                <div className="flex justify-between items-center mt-4">
-                                    <span className="text-2xl font-bold text-amber-600">{product.price} ₽</span>
-                                    <button onClick={() => toggleFavorite(product.id)} className={`p-2 rounded-full transition ${favorites.has(product.id) ? 'text-red-500' : 'text-gray-400 hover:text-red-500'}`}>
+                                <p className="text-2xl font-bold text-gray-800 mt-5">{formatPrice(product.price)} ₽</p>
+                                <div className="mt-6 flex justify-between items-center">
+                                    <button
+                                        onClick={() => addToCart(product.id)}
+                                        className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-md transition text-sm"
+                                    >
+                                        В корзину
+                                    </button>
+                                    <button
+                                        onClick={() => toggleFavorite(product.id)}
+                                        className={`p-2 rounded-full transition ${favorites.has(product.id) ? 'text-red-500' : 'text-gray-400 hover:text-red-500'}`}
+                                        title="В избранное"
+                                    >
                                         <svg className="w-6 h-6" fill={favorites.has(product.id) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                         </svg>
